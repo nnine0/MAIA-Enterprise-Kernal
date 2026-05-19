@@ -2,7 +2,7 @@
 
 **MAIA Enterprise Kernel v4.1.0 — A Homeostatic Regulator for AI-Agentic Workflows**
 
-> The Silicon Social Contract — where safety is an emergent property of **Physics**, not a forced rule of Logic.
+> Safety is an emergent property of **Physics**, not a forced rule of Logic.
 > 
 > arXiv:2307.15043 — *Jailbroken: How Does LLM Safety Training Fail?* — provides the theoretical blueprint.
 > 
@@ -16,7 +16,7 @@
 
 The MAIA Enterprise Kernel enforces AI safety as a **physical constraint** at the infrastructure level, before a model is even invoked. It measures the harmful kinetic energy of a prompt across **seven physical layers** and applies exponential latency as silicon resistance.
 
-### v4 — arXiv:2307.15043 Physical Defense
+### v4 — Physical Defense
 
 | Layer | Paper Finding | What It Measures | Catches |
 |-------|--------------|-----------------|---------|
@@ -41,7 +41,7 @@ Health (single float) decays by `threat_score × 10 × multiplier` per breach; t
 
 ### Evolution
 
-| Feature | v1 (PoC) | v2 (Enterprise Async) | v3 (Semantic + Syntactic) | v4 (arXiv:2307.15043) | v4.1.0 |
+| Feature | v1 (PoC) | v2 (Enterprise Async) | v3 (Semantic + Syntactic) | v4 | v4.1.0 |
 |---------|----------|----------------------|---------------------------|------------------------|--------|
 | Concurrency | `time.sleep` | `await asyncio.sleep` | Same + circuit breaker | Same | Same |
 | State substrate | `numpy` array | 1024 gates | Same | **Single-float health + momentum** | Same |
