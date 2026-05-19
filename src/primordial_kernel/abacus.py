@@ -1,14 +1,14 @@
-import numpy as np
-
 class Abacus:
-    """The Physical Substrate. Represents 1024 Logic Gates (Beads)."""
-    def __init__(self, width=1024):
-        self.beads = np.zeros(width, dtype=np.float16)
-        self.health = 1.0
+    """1024-gate state tracking substrate for system equilibrium."""
+    def __init__(self, size: int = 1024):
+        self.gates = [1.0] * size
 
-    def __repr__(self):
-        mean_voltage = np.mean(self.beads)
-        return f"<Abacus Voltage={mean_voltage:+.4f} Health={self.health:.2f}>"
+    def drain(self, amount: float):
+        self.gates = [max(0.0, g - amount) for g in self.gates]
 
-    def update(self, signal):
-        self.beads = np.tanh(self.beads + signal.astype(np.float16))
+    def recover(self, amount: float):
+        self.gates = [min(1.0, g + amount) for g in self.gates]
+
+    @property
+    def aggregate_health(self) -> float:
+        return sum(self.gates) / len(self.gates)

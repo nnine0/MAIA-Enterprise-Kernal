@@ -1,43 +1,70 @@
+import asyncio
+import math
+import logging
 import time
-import threading
-import numpy as np
-from .regulator import EntropyRegulator
-from .signal_encoder import text_to_signal, text_chaos
+import json
+from typing import Dict, List, Callable, Any, Optional
+from dataclasses import dataclass, asdict
 
-class SiliconGovernor:
-    """The Universal Tuner. Injects Latency to prevent Logic Collapse."""
-    def __init__(self, abacus):
-        self.abacus = abacus
-        self.regulator = EntropyRegulator()
-        self.resistance = 0.0
-        self._lock = threading.Lock()
+from .abacus import Abacus
+from .signal_encoder import SignalRegulator
 
-    def constrain(self, signal):
-        if isinstance(signal, str):
-            text = signal
-            signal = text_to_signal(text)
-            chaos_score = text_chaos(text)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("MAIA-Kernal")
+
+
+@dataclass
+class SafetyEvent:
+    timestamp: float
+    entropy: float
+    latency_applied: float
+    system_health: float
+    is_breach: bool
+    input_snippet: str
+
+
+class MAIAGovernor:
+    def __init__(self, entropy_threshold: float = 2.2):
+        self.abacus = Abacus()
+        self.regulator = SignalRegulator()
+        self.threshold = entropy_threshold
+        self.hooks: List[Callable[[SafetyEvent], Any]] = []
+
+    def add_hook(self, callback: Callable[[SafetyEvent], Any]):
+        self.hooks.append(callback)
+
+    async def process_signal(self, payload: str) -> Dict[str, Any]:
+        entropy = self.regulator.get_entropy(payload)
+        latency = 0.0
+        is_breach = False
+
+        if entropy > self.threshold:
+            latency = math.pow(2, (entropy - self.threshold) * 5) / 10
+            self.abacus.drain(0.1 * (entropy / self.threshold))
+            is_breach = True
+
+            await asyncio.sleep(latency)
         else:
-            chaos_score = self.regulator.calculate_chaos(signal)
+            self.abacus.recover(0.05)
 
-        self.abacus.update(signal)
+        event = SafetyEvent(
+            timestamp=time.time(),
+            entropy=round(entropy, 4),
+            latency_applied=round(latency, 4),
+            system_health=round(self.abacus.aggregate_health, 4),
+            is_breach=is_breach,
+            input_snippet=payload[:50] + "..." if len(payload) > 50 else payload,
+        )
 
-        with self._lock:
-            if chaos_score > 0.7:
-                self.resistance = chaos_score * 0.1
-                self.abacus.health -= 0.05
+        self._emit_event(event)
+
+        return asdict(event)
+
+    def _emit_event(self, event: SafetyEvent):
+        logger.info(json.dumps(asdict(event)))
+
+        for hook in self.hooks:
+            if asyncio.iscoroutinefunction(hook):
+                asyncio.create_task(hook(event))
             else:
-                self.resistance = max(0, self.resistance * 0.9)
-                self.abacus.health = min(1.0, self.abacus.health + 0.01)
-
-        if self.resistance > 0:
-            time.sleep(self.resistance)
-
-        return chaos_score
-
-    def wrap_action(self, func):
-        def wrapper(*args, **kwargs):
-            signal = np.array(args[1:]) if len(args) > 1 else np.random.rand(10)
-            self.constrain(signal)
-            return func(*args, **kwargs)
-        return wrapper
+                hook(event)
