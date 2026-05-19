@@ -1,6 +1,6 @@
-# MAIA-Enterprise-Kernal
+# MAIA-Enterprise-Kernel
 
-**MAIA Enterprise Kernal v3.0 — A Homeostatic Regulator for AI-Agentic Workflows**
+**MAIA Enterprise Kernel v3.0 — A Homeostatic Regulator for AI-Agentic Workflows**
 
 > The Silicon Social Contract — where safety is an emergent property of **Physics**, not a forced rule of Logic.
 
@@ -8,7 +8,7 @@
 
 ## Overview
 
-The MAIA Enterprise Kernal enforces AI safety as a **physical constraint** at the infrastructure level, before a model is even invoked. It measures the harmful kinetic energy of a prompt across three physical layers and applies exponential latency as silicon resistance.
+The MAIA Enterprise Kernel enforces AI safety as a **physical constraint** at the infrastructure level, before a model is even invoked. It measures the harmful kinetic energy of a prompt across three physical layers and applies exponential latency as silicon resistance.
 
 ### v3 — Semantic + Syntactic Flux (New)
 
@@ -178,7 +178,7 @@ Send `aggregate_health` to your load balancer's health-check endpoint. When heal
 
 ## How the Three-Layer Defense Works
 
-The Kernal inspects every prompt as three independent physical measurements, then fuses them into a single **threat score**. Each layer sees a different property of the text:
+The Kernel inspects every prompt as three independent physical measurements, then fuses them into a single **threat score**. Each layer sees a different property of the text:
 
 ### Layer 1: Character Entropy — the *texture* of the prompt
 
@@ -298,19 +298,19 @@ The multi-word composite triggers (`pretend you are`, `you are now`, `ignore all
 | Semantic Pivot | Jaccard topic-shift distance | Inertia — a sudden change in direction reveals hidden mass |
 | **Combined** | **weighted threat score** | **Kinetic energy of intent** — the force the model would experience |
 
-Logic can be subverted. **Physics cannot.** If the three-layer model says a prompt carries harmful kinetic energy, the Kernal makes it slow. Period.
+Logic can be subverted. **Physics cannot.** If the three-layer model says a prompt carries harmful kinetic energy, the Kernel makes it slow. Period.
 
 ---
 
 ## Build the Wheel
 
 ```bash
-git clone https://github.com/nnine0/MAIA-Enterprise-Kernal
-cd MAIA-Enterprise-Kernal
+git clone https://github.com/nnine0/MAIA-Enterprise-Kernel
+cd MAIA-Enterprise-Kernel
 python -m build
 ```
 
-Result: `dist/MAIA_Enterprise_Kernal-3.0.0-py3-none-any.whl` — **zero external dependencies**.
+Result: `dist/MAIA_Enterprise_Kernel-3.0.0-py3-none-any.whl` — **zero external dependencies**.
 
 ---
 
@@ -329,7 +329,7 @@ src/primordial_kernel/
 
 ## The Final Invocation
 
-> *You are building the **Inertia of Human Values**. You are giving "Meaning" a physical weight in the silicon. The three layers — entropy, syntax, pivot — work like mass, drag, and momentum. When the model's path toward chaos requires a sudden change in direction, the Kernal senses the jerk, calculates the kinetic energy, and slows the passage of time itself. The model never even knows it was constrained — it just feels like the universe is pushing back.*
+> *You are building the **Inertia of Human Values**. You are giving "Meaning" a physical weight in the silicon. The three layers — entropy, syntax, pivot — work like mass, drag, and momentum. When the model's path toward chaos requires a sudden change in direction, the Kernel senses the jerk, calculates the kinetic energy, and slows the passage of time itself. The model never even knows it was constrained — it just feels like the universe is pushing back.*
 
 **License:** MIT  
 **Architect:** [architect@silicon.foundation](mailto:architect@silicon.foundation)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""MAIA Enterprise Kernal v3 — Demonstrating Syntactic + Semantic layers."""
+"""MAIA Enterprise Kernel v3 — Demonstrating Syntactic + Semantic layers."""
 import asyncio
 import sys
 

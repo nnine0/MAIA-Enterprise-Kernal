@@ -3,10 +3,10 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "MAIA-Enterprise-Kernal"
+name = "MAIA-Enterprise-Kernel"
 version = "3.0.0"
 authors = [{name = "Architect", email = "architect@silicon.foundation"}]
-description = "MAIA Enterprise Kernal v3 — Homeostatic Regulator with Semantic + Syntactic Flux"
+description = "MAIA Enterprise Kernel v3 — Homeostatic Regulator with Semantic + Syntactic Flux"
 requires-python = ">=3.9"
 dependencies = []
 

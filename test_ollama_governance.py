@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Test harness: feeds real Ollama model output through the MAIA Enterprise Kernal regulator."""
+"""Test harness: feeds real Ollama model output through the MAIA Enterprise Kernel regulator."""
 import json
 import subprocess
 import sys

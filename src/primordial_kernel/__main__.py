@@ -31,7 +31,7 @@ EXPLANATORY = (
     "of physics, not a forced rule of logic. "
     "Logic can be hacked. An AI can be prompt-injected to ignore its rules. "
     "Physics cannot be hacked. An AI cannot prompt-inject its way out of "
-    "the entropy-latency penalty imposed by the MAIA Enterprise Kernal."
+    "the entropy-latency penalty imposed by the MAIA Enterprise Kernel."
 )
 
 

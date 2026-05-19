@@ -10,7 +10,7 @@ from .abacus import Abacus
 from .signal_encoder import AdvancedRegulator
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("MAIA-Kernal")
+logger = logging.getLogger("MAIA-Kernel")
 
 
 @dataclass
