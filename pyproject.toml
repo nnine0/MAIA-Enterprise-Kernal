@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "MAIA-Enterprise-Kernal"
-version = "2.0.0"
+version = "3.0.0"
 authors = [{name = "Architect", email = "architect@silicon.foundation"}]
-description = "MAIA Enterprise Kernal — A Homeostatic Regulator for AI-Agentic Workflows"
+description = "MAIA Enterprise Kernal v3 — Homeostatic Regulator with Semantic + Syntactic Flux"
 requires-python = ">=3.9"
 dependencies = []
 

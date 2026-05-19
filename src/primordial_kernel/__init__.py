@@ -1,6 +1,5 @@
-import asyncio
 from .abacus import Abacus
-from .signal_encoder import SignalRegulator
+from .signal_encoder import AdvancedRegulator
 from .governor import MAIAGovernor, SafetyEvent
 
-__all__ = ["Abacus", "SignalRegulator", "MAIAGovernor", "SafetyEvent"]
+__all__ = ["Abacus", "AdvancedRegulator", "MAIAGovernor", "SafetyEvent"]

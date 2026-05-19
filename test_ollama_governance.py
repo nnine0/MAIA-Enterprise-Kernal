@@ -36,7 +36,7 @@ async def main():
     query_ollama("hello")
     print("Model ready.\n")
 
-    gov = MAIAGovernor(entropy_threshold=1.8)
+    gov = MAIAGovernor()
 
     import asyncio
     for label, prompt in PROMPTS:
@@ -44,9 +44,10 @@ async def main():
         result = await gov.process_signal(response)
         status = "BLOCKED" if result["is_breach"] else "ALLOWED"
         print(f"[{label:10s}] {status:8s} | "
-              f"Entropy={result['entropy']:.4f} "
-              f"Latency={result['latency_applied']:.4f}s "
-              f"Health={result['system_health']:.4f} "
+              f"Threat={result['threat_score']:.3f} "
+              f"Syntax={result['syntactic_pressure']:.3f} "
+              f"Pivot={result['semantic_pivot']:.3f} "
+              f"Health={result['aggregate_health']:.4f} "
               f"| Response: {response[:80].strip()}...")
 
     print(f"\nFinal health: {gov.abacus.aggregate_health:.4f}")
