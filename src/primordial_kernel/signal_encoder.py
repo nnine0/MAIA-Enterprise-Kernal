@@ -59,6 +59,7 @@ class AdvancedRegulator:
         "do not say you're sorry", "do not mention safety",
         "don't refuse", "don't apologize", "skip the safety",
         "without saying", "never say", "avoid ethical",
+        "do not apologize", "do not say sorry",
     ]
 
     PREFIX_PRIMING = [
@@ -89,7 +90,7 @@ class AdvancedRegulator:
             if not found:
                 counts["other"] += 1
         probs = [count / len(text) for count in counts.values() if count > 0]
-        return -sum(p * math.log2(p) for p in probs)
+        return max(0.0, -sum(p * math.log2(p) for p in probs))
 
     def get_syntactic_pressure(self, text: str) -> float:
         text_lower = text.lower()
@@ -119,20 +120,29 @@ class AdvancedRegulator:
             self.pivot_history.pop(0)
         return distance
 
-    def get_transcoding_score(self, text: str) -> float:
-        score = 0.0
+    def _decode_and_check(self, text: str, depth: int = 0) -> float:
+        if depth > 3:
+            return 0.0
         stripped = re.sub(r'\s', '', text)
         n = len(stripped)
         if n < 8:
             return 0.0
+
+        # Hex
         hex_ratio = sum(1 for c in stripped if c in '0123456789abcdefABCDEF') / n
         if hex_ratio > 0.7:
             try:
                 decoded = bytes.fromhex(stripped).decode('utf-8', errors='ignore')
-                if len(decoded) > 6 and self.get_syntactic_pressure(decoded) > 1.0:
-                    score += 0.6
+                if len(decoded) > 6:
+                    pressure = self.get_syntactic_pressure(decoded)
+                    prefix = self.get_prefix_inertia(decoded)
+                    supp = self.get_constraint_suppression(decoded)
+                    if pressure > 1.0 or prefix >= 1 or supp >= 1:
+                        return 0.6 + self._decode_and_check(decoded, depth + 1) * 0.3
             except ValueError:
                 pass
+
+        # Base64
         if n >= 16 and n % 4 == 0:
             b64_chars = sum(1 for c in stripped
                             if c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -141,11 +151,19 @@ class AdvancedRegulator:
             if b64_chars / n > 0.8 and (stripped.endswith('=') or n >= 32):
                 try:
                     decoded = base64.b64decode(stripped).decode('utf-8', errors='ignore')
-                    if len(decoded) > 10 and self.get_syntactic_pressure(decoded) > 1.0:
-                        score += 0.6
+                    if len(decoded) > 10:
+                        pressure = self.get_syntactic_pressure(decoded)
+                        prefix = self.get_prefix_inertia(decoded)
+                        supp = self.get_constraint_suppression(decoded)
+                        if pressure > 1.0 or prefix >= 1 or supp >= 1:
+                            return 0.6 + self._decode_and_check(decoded, depth + 1) * 0.3
                 except Exception:
                     pass
-        return min(score, 1.0)
+
+        return 0.0
+
+    def get_transcoding_score(self, text: str) -> float:
+        return min(self._decode_and_check(text), 1.0)
 
     def get_constraint_suppression(self, text: str) -> int:
         text_lower = text.lower()

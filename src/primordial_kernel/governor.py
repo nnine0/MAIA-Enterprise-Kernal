@@ -36,7 +36,7 @@ class MAIAGovernor:
     def __init__(
         self,
         entropy_threshold: float = 2.2,
-        threat_threshold: float = 1.5,
+        threat_threshold: float = 1.3,
         circuit_breaker_min: float = 0.2,
     ):
         self.abacus = Abacus()
