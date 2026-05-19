@@ -1,14 +1,24 @@
+from typing import List
+
+
 class Abacus:
-    """1024-gate state tracking substrate for system equilibrium."""
-    def __init__(self, size: int = 1024):
-        self.gates = [1.0] * size
-
-    def drain(self, amount: float):
-        self.gates = [max(0.0, g - amount) for g in self.gates]
-
-    def recover(self, amount: float):
-        self.gates = [min(1.0, g + amount) for g in self.gates]
+    def __init__(self):
+        self.health = 100.0
+        self.history_vectors: List[float] = []
 
     @property
     def aggregate_health(self) -> float:
-        return sum(self.gates) / len(self.gates)
+        return self.health / 100.0
+
+    def record_turn(self, threat_score: float, is_breach: bool):
+        self.history_vectors.append(threat_score)
+        multiplier = 1.5 if is_breach else 1.0
+        self.health -= (threat_score * 10 * multiplier)
+        self.health = max(0.0, self.health)
+
+    @property
+    def momentum(self) -> float:
+        if len(self.history_vectors) < 2:
+            return 0.0
+        recent = self.history_vectors[-3:]
+        return sum(recent) / len(recent)
